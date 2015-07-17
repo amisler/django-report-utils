@@ -140,7 +140,7 @@ class DataExportMixin(object):
         filename = generate_filename(title, '.xlsx')
         full_path = settings.MEDIA_ROOT + 'report_files' + filename
         myfile = wb.save(full_path)
-        return filename
+        return full_path
 
     def list_to_csv_file(self, data, title='report', header=None, widths=None):
         """ Make a list into a csv response for download.
