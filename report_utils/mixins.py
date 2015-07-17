@@ -113,7 +113,8 @@ class DataExportMixin(object):
                     sheet_data, ws, sheet_name=sheet_name, header=header)
                 i += 1
         else:
-            ws = wb.worksheets[0]
+            ws = wb.create_sheet()
+            #ws = wb.worksheets[0]
             self.build_sheet(data, ws, header=header, widths=widths)
         return wb
 
