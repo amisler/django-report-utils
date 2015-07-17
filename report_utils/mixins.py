@@ -8,6 +8,7 @@ from openpyxl.workbook import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.cell import get_column_letter
 from openpyxl.styles import Font
+from django.conf import settings
 import csv
 import re
 from collections import namedtuple
@@ -39,7 +40,6 @@ def generate_filename(title, ends_with):
 
 class DataExportMixin(object):
     def build_sheet(self, data, ws, sheet_name='report', header=None, widths=None):
-        from openpyxl.writer.dump_worksheet import WriteOnlyCell
         first_row = 1
         column_base = 1
 
@@ -134,11 +134,12 @@ class DataExportMixin(object):
         wb = self.list_to_workbook(data, title, header, widths)
         if not title.endswith('.xlsx'):
             title += '.xlsx'
-        #myfile = BytesIO()
+        myfile = BytesIO()
         print 'WRITING FILE'
         #myfile.write(save_virtual_workbook(wb))
-        myfile = wb.save(title)
-        return myfile
+        filename = generate_filename(title, '.xlsx')
+        myfile = wb.save(settings.MEDIA_ROOT + 'report_files' + filename)
+        return filename
 
     def list_to_csv_file(self, data, title='report', header=None, widths=None):
         """ Make a list into a csv response for download.
