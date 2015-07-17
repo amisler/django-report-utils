@@ -99,7 +99,8 @@ class DataExportMixin(object):
 
     def list_to_workbook(self, data, title='report', header=None, widths=None):
         """ Create just a openpxl workbook from a list of data """
-        wb = Workbook()
+        wb = Workbook(optimized_write = True)
+        print 'IN LIST TO WORKBOOK'
         title = re.sub(r'\W+', '', title)[:30]
 
         if isinstance(data, dict):
@@ -122,10 +123,12 @@ class DataExportMixin(object):
         like {'sheet_1': [['A1', 'B1']]}
         returns a StringIO file
         """
+        print 'IN LIST TO XLSX'
         wb = self.list_to_workbook(data, title, header, widths)
         if not title.endswith('.xlsx'):
             title += '.xlsx'
         myfile = BytesIO()
+        print 'WRITING FILE'
         myfile.write(save_virtual_workbook(wb))
         return myfile
 
@@ -148,6 +151,7 @@ class DataExportMixin(object):
         data can be a 2d array or a dict of 2d arrays
         like {'sheet_1': [['A1', 'B1']]}
         """
+        print 'IN LIST TO XLSX RESPONSE'
         wb = self.list_to_workbook(data, title, header, widths)
         return self.build_xlsx_response(wb, title=title)
 
@@ -183,6 +187,7 @@ class DataExportMixin(object):
         Returns list, message in case of issues.
         """
         model_class = queryset.model
+        print 'IN REPORT TO LIST'
 
         def can_change_or_view(model):
             """ Return True iff `user` has either change or view permission
@@ -205,10 +210,12 @@ class DataExportMixin(object):
 
         if isinstance(display_fields, list):
             # Convert list of strings to DisplayField objects.
+            print 'CHECKPOINT 1'
 
             new_display_fields = []
 
             for display_field in display_fields:
+                print display_field
                 field_list = display_field.split('__')
                 field = field_list[-1]
                 path = '__'.join(field_list[:-1])
@@ -246,13 +253,15 @@ class DataExportMixin(object):
         property_list = {}
         custom_list = {}
         display_totals = {}
-
+        print 'CHECKPOINT 2'
         for i, display_field in enumerate(display_fields):
             model = get_model_from_path_string(model_class, display_field.path)
 
             if display_field.field_type == "Invalid":
                 continue
 
+            print display_field
+            print i
             if not model or can_change_or_view(model):
                 display_field_key = display_field.path + display_field.field
 
@@ -303,6 +312,7 @@ class DataExportMixin(object):
             display_field_paths.insert(0, 'pk')
 
             m2m_relations = []
+            print 'm2m_relations'
             for position, property_path in property_list.items():
                 property_root = property_path.split('__')[0]
                 root_class = model_class
@@ -323,6 +333,7 @@ class DataExportMixin(object):
                 [row[field] for field in display_field_paths]
                 for row in values
             ]
+            print 'row in filtered'
             for row in filtered_report_rows:
                 for pos, field in enumerate(display_field_paths):
                     increment_total(field, row[pos])
@@ -331,7 +342,7 @@ class DataExportMixin(object):
             values_and_properties_list = []
 
             values_list = objects.values_list(*display_field_paths)
-
+            print 'CHECKPOINT 3'
             for row in values_list:
                 row = list(row)
                 values_and_properties_list.append(row[1:])
@@ -434,6 +445,7 @@ class DataExportMixin(object):
         # Build mapping from display field position to choices list.
 
         choice_lists = {}
+        print ' display fields'
         for df in display_fields:
             if df.choices and hasattr(df, 'choices_dict'):
                 df_choices = df.choices_dict
@@ -465,7 +477,7 @@ class DataExportMixin(object):
         # Iterate rows and convert values by choice lists and field formats.
 
         final_list = []
-
+        print 'iterate rows and conver values by choice lists'
         for row in values_and_properties_list:
             row = list(row)
 
