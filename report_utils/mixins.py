@@ -39,17 +39,29 @@ def generate_filename(title, ends_with):
 
 class DataExportMixin(object):
     def build_sheet(self, data, ws, sheet_name='report', header=None, widths=None):
+        from openpyxl.writer.dump_worksheet import WriteOnlyCell
         first_row = 1
         column_base = 1
 
         ws.title = re.sub(r'\W+', '', sheet_name)[:30]
         if header:
-            for i, header_cell in enumerate(header):
-                cell = ws.cell(row=first_row, column=i+column_base)
-                cell.value = header_cell
-                cell.font = Font(bold=True)
-                if widths:
-                    ws.column_dimensions[get_column_letter(i+1)].width = widths[i]
+            if ws.write_only:
+
+                ws.append(header)
+                # for i, header_cell in enumerate(header):
+                #     cell = WriteOnlyCell(ws)
+                #     cell.value = header_cell
+                #     cell.font = Font(bold=True)
+                #     if widths:
+                #         ws.column_dimensions[get_column_letter(i+1)].width = widths[i]
+
+            else:
+                for i, header_cell in enumerate(header):
+                    cell = ws.cell(row=first_row, column=i+column_base)
+                    cell.value = header_cell
+                    cell.font = Font(bold=True)
+                    if widths:
+                        ws.column_dimensions[get_column_letter(i+1)].width = widths[i]
 
         for row in data:
             for i in range(len(row)):
