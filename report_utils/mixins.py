@@ -45,7 +45,7 @@ class DataExportMixin(object):
 
         ws.title = re.sub(r'\W+', '', sheet_name)[:30]
         if header:
-            
+
 
             ws.append(header)
                 # for i, header_cell in enumerate(header):
@@ -134,9 +134,10 @@ class DataExportMixin(object):
         wb = self.list_to_workbook(data, title, header, widths)
         if not title.endswith('.xlsx'):
             title += '.xlsx'
-        myfile = BytesIO()
+        #myfile = BytesIO()
         print 'WRITING FILE'
-        myfile.write(save_virtual_workbook(wb))
+        #myfile.write(save_virtual_workbook(wb))
+        myfile = wb.save(title)
         return myfile
 
     def list_to_csv_file(self, data, title='report', header=None, widths=None):
@@ -521,7 +522,8 @@ class DataExportMixin(object):
                 ['TOTALS'] + (len(fields_and_properties) - 1) * ['']
             )
             values_and_properties_list.append(display_totals_row)
-
+        print values_and_properties_list
+        print message
         return values_and_properties_list, message
 
     def sort_helper(self, value, default):
