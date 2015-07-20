@@ -138,7 +138,7 @@ class DataExportMixin(object):
         #print 'WRITING FILE'
         #myfile.write(save_virtual_workbook(wb))
         filename = generate_filename(title, '.xlsx')
-        full_path = filename
+        full_path = settings.MEDIA_ROOT + '/report_files/' + filename
         myfile = wb.save(full_path)
         return full_path
 
